@@ -31,13 +31,11 @@ struct ContentView: View {
     @State private var isShowingRed = false
     
     var body: some View {
-        VStack {
-            Button("Click Me") {
-                withAnimation {
-                    isShowingRed.toggle()
-                }
-            }
-
+        ZStack {
+            Rectangle()
+                .fill(.blue)
+                .frame(width: 200, height: 200)
+            
             if isShowingRed {
                 Rectangle()
                     .fill(.red)
@@ -45,7 +43,11 @@ struct ContentView: View {
                     .transition(.pivot)
             }
         }
-        .frame(width: 300, height: 300)
+        .onTapGesture {
+            withAnimation {
+                isShowingRed.toggle()
+            }
+        }
     }
 }
 struct ContentView_Previews: PreviewProvider {
