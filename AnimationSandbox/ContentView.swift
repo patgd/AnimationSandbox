@@ -7,38 +7,47 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @State private var animationAmount = 1.0
+struct CornerRotateModifier: ViewModifier {
+    let amount: Double
+    let anchor: UnitPoint
     
-    var body: some View {
-        VStack {
-//            Stepper("Scale Amount", value: $animationAmount.animation(), in: 1...10)
-            
-            Text("Click Me")
-                .onTapGesture {
-                   animationAmount += 1
-                }
-                .padding(50)
-                .background(.red)
-                .foregroundColor(.white)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(.red)
-                        .scaleEffect(animationAmount)
-                        .opacity(2 - animationAmount)
-                        .animation(
-                            .easeOut(duration: 1)
-                                .repeatForever(autoreverses: false),
-                            value: animationAmount
-                        )
-                )
-                .padding(100)
-                .onAppear { animationAmount = 2 }
-        }
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(.degrees(amount), anchor: anchor)
+            .clipped()
     }
 }
 
+extension AnyTransition {
+    static var pivot: AnyTransition {
+        .modifier(
+            active: CornerRotateModifier(amount: -90, anchor: .topLeading),
+            identity: CornerRotateModifier(amount: 0, anchor: .topLeading)
+        )
+    }
+}
+
+struct ContentView: View {
+    @State private var isShowingRed = false
+    
+    var body: some View {
+        VStack {
+            Button("Click Me") {
+                withAnimation {
+                    isShowingRed.toggle()
+                }
+            }
+
+            if isShowingRed {
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: 200, height: 200)
+                    .transition(.pivot)
+            }
+        }
+        .frame(width: 300, height: 300)
+    }
+}
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
